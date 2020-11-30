@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tio-WebSocket-Server</title>
+</head>
+<body>
+<script>
+
+    var ws = new WebSocket("ws://localhost:6789");
+
+    ws.onopen = function (event) {
+        console.log("connected success");
+    }
+    ws.onmessage = function (p1) {
+        console.log("received message:" + p1.data);
+    }
+
+    ws.onclose = function (p1) {
+        console.log("server shutdown");
+    }
+
+    ws.onerror = function (event) {
+        console.log("error");
+    }
+
+
+</script>
+
+</body>
+</html>
