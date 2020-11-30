@@ -17,6 +17,7 @@ import org.tio.websocket.server.handler.IWsMsgHandler;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @author fanyuepan
@@ -24,6 +25,8 @@ import java.lang.reflect.Field;
 public class TioWebSocketServerBootstrap {
 
     private static final Logger logger = LoggerFactory.getLogger(TioWebSocketServerBootstrap.class);
+
+    private AtomicBoolean started = new AtomicBoolean(false);
 
     private ApplicationContext applicationContext;
 
@@ -50,12 +53,14 @@ public class TioWebSocketServerBootstrap {
     }
 
     public final void start() {
-
-        try {
-            doInit();
-            doStart();
-        } catch (Exception e) {
-            applicationListener.onException(e);
+        if (started.get() == false) {
+            try {
+                doInit();
+                doStart();
+                started.compareAndSet(false,true);
+            } catch (Exception e) {
+                applicationListener.onException(e);
+            }
         }
     }
 
@@ -78,16 +83,21 @@ public class TioWebSocketServerBootstrap {
 
         serverStarter = new WsServerStarter(config,
                 msgHandler,
-                uuid == null ? new DefaultTioUuid() : uuid,
+                uuid,
                 Threads.getTioExecutor(),
                 Threads.getGroupExecutor());
 
     }
 
     private void initOptionalBeans() {
+        uuid = getBean(TioUuid.class);
         groupListener = getBean(GroupListener.class);
         ipStatListener = getBean(IpStatListener.class);
         applicationListener = getBean(TioWebSocketApplicationListener.class);
+
+        if (uuid == null){
+            uuid = new DefaultTioUuid();
+        }
         if (applicationListener == null) {
             applicationListener = new TioWebSocketApplicationListener() {
                 @Override
@@ -157,5 +167,9 @@ public class TioWebSocketServerBootstrap {
             field.setAccessible(true);
             field.set(server, false);
         } catch (Exception e) { }
+    }
+
+    public boolean isStarted() {
+        return started.get();
     }
 }
