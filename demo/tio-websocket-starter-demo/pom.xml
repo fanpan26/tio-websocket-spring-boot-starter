@@ -13,13 +13,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>tio-websocket-starter-demo</name>
 	<description>Demo project for tio-websocket-spring-boot-starter</description>
-
-	<repositories>
-		<repository>
-			<id>jitpack.io</id>
-			<url>https://jitpack.io</url>
-		</repository>
-	</repositories>
+	
 	<properties>
 		<java.version>1.8</java.version>
 	</properties>
